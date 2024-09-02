@@ -15,6 +15,7 @@ public class Main {
         user.setName("John Doe");
         user.setEmail("john.doe@example.com");
         
+
         // Save the user to the database
         EntityTransaction transaction = em.getTransaction();
         try {
