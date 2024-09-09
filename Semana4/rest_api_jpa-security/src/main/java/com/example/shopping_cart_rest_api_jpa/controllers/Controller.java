@@ -20,49 +20,56 @@ public class Controller {
     @Autowired
     private Repository repo;
 
+    // Basic endpoint to check if the API is connected
     @GetMapping()
     public String index(){
-        return "Connected";
+        return "Connected"; 
     }
 
+    // Endpoint to get a list of all items
     @GetMapping("items")
-    public List<Item> getPerson(){
-        return repo.findAll();
+    public List<Item> getItems(){
+        return repo.findAll(); 
     }
 
+    // Endpoint to save a single item to the database
     @PostMapping("save")
-    public String save(@RequestBody Item item){
+    public String save(@RequestBody Item item){ // Maps the request body to an Item object
         System.out.println("New item: " + item);
-        repo.save(item);
+        repo.save(item); 
         return "saved";
     } 
 
+    // Endpoint to save a list of items to the database
     @PostMapping("/saveList")
-        public String saveList(@RequestBody List<Item> items) {
+    public String saveList(@RequestBody List<Item> items) {
         repo.saveAll(items); 
-        return "saved list";
+        return "saved list"; 
     }
 
+    // Endpoint to update an item in the database by id
     @PutMapping("edit/{id}")
     public String update(@PathVariable long id, @RequestBody Item item){
-        Item updateItem = repo.findById(id).get();
+        // Finds the item by id, throws an exception if not found
+        Item updateItem = repo.findById(id).get(); 
+        // Updates the item's fields with the values from the request
         updateItem.setName(item.getName());
         updateItem.setPrice(item.getPrice());
         updateItem.setExpiryDate(item.getExpiryDate());
         updateItem.setSection(item.getSection());
         updateItem.setWeight(item.getWeight());
+        // Saves the updated item back to the repository
         repo.save(updateItem);
-        return "edited";
+        return "edited"; 
     }
 
+    // Endpoint to delete an item by id
     @DeleteMapping("delete/{id}")
     public String delete(@PathVariable long id, @RequestBody Item item){
+        // Finds the item by id, throws an exception if not found
         Item deleteItem = repo.findById(id).get();
+        // Deletes the item from the repository
         repo.delete(deleteItem);
-        return "deleted";
+        return "deleted"; 
     }
-
-    
-
-
 }

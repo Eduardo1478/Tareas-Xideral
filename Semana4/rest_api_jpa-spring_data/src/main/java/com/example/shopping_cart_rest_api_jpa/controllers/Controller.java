@@ -20,16 +20,19 @@ public class Controller {
     @Autowired
     private Repository repo;
 
+    //Checks if the rest API is connected
     @GetMapping()
     public String index(){
         return "Connected";
     }
 
+    //Retrieves all items
     @GetMapping("items")
     public List<Item> getPerson(){
         return repo.findAll();
     }
 
+    //Save an item
     @PostMapping("save")
     public String save(@RequestBody Item item){
         System.out.println("New item: " + item);
@@ -37,12 +40,14 @@ public class Controller {
         return "saved";
     } 
 
+    //Saves list of items
     @PostMapping("/saveList")
         public String saveList(@RequestBody List<Item> items) {
         repo.saveAll(items); 
         return "saved list";
     }
 
+    //Edit an item
     @PutMapping("edit/{id}")
     public String update(@PathVariable long id, @RequestBody Item item){
         Item updateItem = repo.findById(id).get();
@@ -55,6 +60,7 @@ public class Controller {
         return "edited";
     }
 
+    //delete an item
     @DeleteMapping("delete/{id}")
     public String delete(@PathVariable long id, @RequestBody Item item){
         Item deleteItem = repo.findById(id).get();

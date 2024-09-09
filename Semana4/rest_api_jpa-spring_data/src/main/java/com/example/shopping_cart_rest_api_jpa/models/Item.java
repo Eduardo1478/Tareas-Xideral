@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+//Setters and getters of item using lombok
 @Entity
 @Table(name = "shopping_list")
 public class Item {

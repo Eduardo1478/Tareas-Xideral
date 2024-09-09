@@ -21,7 +21,7 @@
 		<!-- Spring Boot Web & Data JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId> 
 		</dependency>
 
 		<dependency>
@@ -47,7 +47,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 
@@ -56,7 +55,6 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>5.0.0</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- Mockito JUnit 5 Integration -->
@@ -64,7 +62,6 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
 			<version>5.0.0</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- Mockito Inline (Optional, for mocking final classes) -->
@@ -72,7 +69,6 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-inline</artifactId>
 			<version>5.0.0</version>
-			<scope>test</scope>
 		</dependency>
 		
 	</dependencies>
