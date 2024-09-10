@@ -14,6 +14,8 @@ public class SecurityConfig {
         http.csrf().disable()
             .authorizeHttpRequests()
                 .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/save").hasRole("USER") // or .authenticated() if you don't use roles
+
                 .anyRequest().authenticated()
             .and()
             .httpBasic();
