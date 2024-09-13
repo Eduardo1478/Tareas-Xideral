@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+        .items-container, .cart-container {
+            width: 45%;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        h1, h2 { 
+            font-size: 24px; 
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .item-details {
+            display: none;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+        }
+        .arrow {
+            font-size: 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: inline-block;
+            transform: rotate(0deg);
+            transition: transform 0.3s;
+        }
+        .arrow.active {
+            transform: rotate(90deg);
+        }
+        .item-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-label {
+            display: flex;
+            align-items: center;
+            padding-left: 5px;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+        .item-label input {
+            margin-right: 5px;
+        }
+        .cart-totals {
+            margin-top: 20px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Available Items Section -->
+        <div class="items-container">
+            <h1>Available Items</h1>
+
+            <!-- Button to create a new cart -->
+            <button onclick="createNewCart()">Create New Cart</button>
+
+            <!-- Input field for cart ID -->
+            <input type="number" id="cartId" placeholder="Cart ID" style="margin-bottom: 20px;">
+
+            <!-- List of items -->
+            <ul id="itemList"></ul>
+
+            <!-- Add selected items to cart button -->
+            <button onclick="addSelectedItemsToCart()">Add Selected Items to Cart</button>
+        </div>
+
+        <!-- Shopping Cart Section -->
+        <div class="cart-container">
+            <h2>Your Cart</h2>
+
+            <!-- Section to display cart items with their quantities -->
+            <ul id="cartItems"></ul>
+
+            <!-- Cart totals -->
+            <div class="cart-totals">
+                <p>Total Price (before tax): <span id="totalPrice">$0</span></p>
+                <p>Total Price (with tax): <span id="totalPriceWithTax">$0</span></p>
+                <p>Total Weight: <span id="totalWeight">0 kg</span></p>
+            </div>
+
+            <!-- Fetch cart details button -->
+            <button onclick="fetchCartDetails()">View Cart</button>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = "http://localhost:8080";  // Adjust as needed
+
+        // Fetch available items from the backend and display them in the list
+        function fetchAvailableItems() {
+            fetch(`${apiUrl}/shop/items`)
+                .then(response => response.json())
+                .then(data => {
+                    const itemList = document.getElementById('itemList');
+                    itemList.innerHTML = '';  // Clear the current list
+
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <div class="item-container">
+                                <div class="item-label">
+                                    <input type="checkbox" id="item-${item.id}" value="${item.id}">
+                                    <label for="item-${item.id}">${item.name}</label>
+                                </div>
+                                <span class="arrow" onclick="toggleItemDetails(${item.id}, this)">&#x25B6;</span>
+                            </div>
+                            <div class="item-details" id="item-details-${item.id}">
+                                <p>Price: $${item.price}</p>
+                                <p>Section: ${item.section}</p>
+                                <p>Weight: ${item.weight}</p>
+                            </div>
+                        `;
+                        itemList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error fetching items:', error));
+        }
+
+        // Function to toggle item details
+        function toggleItemDetails(itemId, arrow) {
+            const details = document.getElementById(`item-details-${itemId}`);
+            if (details.style.display === 'block') {
+                details.style.display = 'none';
+                arrow.innerHTML = '&#x25B6;'; // Closed arrow
+            } else {
+                details.style.display = 'block';
+                arrow.innerHTML = '&#x25BC;'; // Down arrow
+            }
+        }
+
+        // Add selected items to the cart
+        function addSelectedItemsToCart() {
+            const cartId = document.getElementById('cartId').value;
+            const selectedItems = document.querySelectorAll('input[type="checkbox"]:checked');
+            
+            if (!cartId) {
+                alert('Please enter a Cart ID.');
+                return;
+            }
+
+            if (selectedItems.length === 0) {
+                alert('Please select at least one item.');
+                return;
+            }
+
+            selectedItems.forEach(item => {
+                const itemId = item.value;
+
+                fetch(`${apiUrl}/cart/add/${cartId}/${itemId}`, { 
+                    method: 'POST'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log(`Added item ${itemId} to cart ${cartId}`);
+                })
+                .catch(error => console.error('Error adding item to cart:', error));
+            });
+
+            alert('Selected items added to cart!');
+        }
+
+        // Create a new cart
+        function createNewCart() {
+            fetch(`${apiUrl}/cart/createCart`, {
+                method: 'POST'
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);  // Display the created cart ID
+                console.log(data);
+            })
+            .catch(error => console.error('Error creating cart:', error));
+        }
+
+        // Fetch cart details and display them along with totals
+        function fetchCartDetails() {
+            const cartId = document.getElementById('cartId').value;
+            if (!cartId) {
+                alert('Please enter a Cart ID.');
+                return;
+            }
+
+            fetch(`${apiUrl}/cart/view/${cartId}`)
+                .then(response => response.json())
+                .then(cart => {
+                    const cartItems = document.getElementById('cartItems');
+                    const totalPriceElem = document.getElementById('totalPrice');
+                    const totalPriceWithTaxElem = document.getElementById('totalPriceWithTax');
+                    const totalWeightElem = document.getElementById('totalWeight');
+                    
+                    cartItems.innerHTML = '';  // Clear the current cart items
+                    let totalPrice = 0;
+                    let totalWeight = 0;
+
+                    if (cart.cartItems.length === 0) {
+                        cartItems.innerHTML = `<li>Your cart is empty</li>`;
+                    } else {
+                        cart.cartItems.forEach(cartItem => {
+                            const li = document.createElement('li');
+                            li.style.display = 'flex'; // Use flexbox for alignment
+                            li.style.justifyContent = 'space-between'; // Space between the item and price
+                            li.innerHTML = `
+                                <span>${cartItem.quantity} x ${cartItem.item.name}</span>
+                                <span>${cartItem.item.price} $</span>                            `;
+                            cartItems.appendChild(li);
+
+                            // Update total price and weight
+                            totalPrice += cartItem.item.price * cartItem.quantity;
+                            totalWeight += cartItem.item.weight * cartItem.quantity;
+                        });
+
+                        const tax = totalPrice * 0.16;
+                        totalPriceElem.textContent = `$${totalPrice.toFixed(2)}`;
+                        totalPriceWithTaxElem.textContent = `$${(totalPrice + tax).toFixed(2)}`;
+                        totalWeightElem.textContent = `${totalWeight.toFixed(2)} kg`;
+                    }
+                })
+                .catch(error => console.error('Error fetching cart details:', error));
+        }
+
+        // Fetch the available items when the page loads
+        window.onload = function() {
+            fetchAvailableItems();
+        };
+    </script>
+</body>
+</html>
